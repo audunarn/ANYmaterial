@@ -1,0 +1,109 @@
+# Changelog
+
+## Unreleased
+
+Added:
+
+- **A material library.** `library()` returns 19 named materials: the 17
+  DNV-RP-C208 grade and thickness-class rows, each with its flow curve, plus two
+  curated entries. `MaterialLibrary` supports `get`, `find` (by category, status,
+  text or whether it has a curve), `add`, `remove` and JSON round-tripping;
+  `LibraryEntry` carries the category, the standard, the source and free notes.
+- **Provenance as a first-class field.** Every entry has a `status`:
+  `tabulated` for a standard's own table, `indicative` for a typical published
+  figure that is **not a design value**, `user` for anything added at runtime.
+  `LibraryEntry.is_design_value` exposes the distinction, and the CLI and the
+  editor both surface it.
+- **User-extensible.** `add_to_user_library` writes to
+  `~/.anymaterial/materials.json`, or wherever `ANYMATERIAL_LIBRARY` points. A
+  user entry with the same name as a shipped one takes precedence, which is how a
+  grade gets corrected locally without editing the package. Anything added is
+  recorded as `status="user"` even if it claims otherwise, so adding cannot
+  launder provenance.
+- **Curve plots as SVG.** `anymaterial.plot` renders flow curves without a
+  plotting dependency — hand-written SVG, so the output goes into a report or a
+  commit as text. `sample_curve`, `curve_svg` and `write_curve_svg`.
+- **CLI** gained `library` (list and filter), `plot` (write an SVG) and `add`
+  (put a material in the user library).
+- **Editor** gained a library pane: browse and filter on the left, load an entry
+  into the form, see the selected entry's provenance, and plot the edited
+  material against the library selection. Buttons add the current material to the
+  library and export the plotted curves to SVG.
+
+Two curated materials were added from sources found online. Their numbers are
+attributed in `data/materials.json` and marked `indicative`:
+
+- **EN AW-6082-T6** — E 70 GPa, 0.2% proof 310 MPa, tensile 340 MPa, density
+  2700 kg/m³, from the thyssenkrupp datasheet. That datasheet does not separate
+  tempers, and EN 1999-1-1 characteristic values for design are lower and depend
+  on product form and thickness; the entry says so.
+- **EN 1.4404 (316L)** — E 200 GPa and density 8000 kg/m³ from the thyssenkrupp
+  datasheet, 0.2% proof 220 MPa and tensile 500 MPa as commonly quoted for the
+  grade under EN 10088-3.
+
+Neither carries a hardening curve, because no citable source for one was found.
+Nothing was invented to fill the gap: an aluminium entry (EN AW-5083-H111) was
+prepared and then dropped when both candidate sources returned HTTP 403 and the
+numbers could not be verified.
+
+## 0.1.0
+
+First feature release. The material code is extracted from ANYsolver and
+ANYfem; see [MIGRATION.md](MIGRATION.md) for provenance.
+
+Added:
+
+- **Contract** — `StructuralMaterial` protocol, `ENGINEERING_VOIGT_ORDER`,
+  symmetry resolution and `elastic_compliance_matrix`. Structural rather than
+  inheritance-based, so a material defined in another package satisfies it
+  without importing anything from here.
+- **Materials** — `IsotropicMaterial` and `OrthotropicMaterial`, both validated
+  on construction.
+- **Reductions** — `shell_material_matrices`, `beam_material_properties` and
+  `shell_characteristic_modulus`, all derived from the 6x6 compliance so
+  isotropic and orthotropic materials reach a formulation by the same path.
+- **Yield** — `Hill48Yield` plus free functions `hill48_strengths`,
+  `hill48_coefficients` and `hill48_equivalent_stress` that consume the
+  six-strength protocol by attribute lookup.
+- **Curves** — the `HardeningCurve` protocol and four implementations:
+  `LinearHardeningCurve`, `PiecewiseLinearCurve`, `PowerLawHardeningCurve` and
+  the ported `DNVC208MaterialCurve`. The first three are new.
+- **Library** — `steel()`, `available_grades()`, `thickness_classes()`,
+  `dnv_c208_steel_properties()` and `dnv_c208_steel_curve()`. The RP-C208 grade
+  table now lives in `data/dnv_rp_c208.json` instead of in code.
+- **Specifications** — `MaterialSpec`, which records *how to rebuild* a
+  hardening curve rather than a frozen copy, so a saved material does not reload
+  as elastic. `hardening_descriptor` raises for a curve it cannot describe rather
+  than serializing it away.
+- **Editor** — a tkinter form with live validation and a flow-curve plot on a
+  plain `Canvas`, entry point `anymaterial-gui`.
+- **CLI** — `anymaterial grades|properties|curve|show|validate`, each with
+  `--json`.
+
+Verified bit-exact against `anysolver` 0.1.3 at
+`8b4553cc680ff925df850e627165fc336615eaba` for the full RP-C208 table (17 rows),
+the flow stress and hardening modulus of every resulting curve, isotropic and
+orthotropic compliance, all three reductions, the Hill-48 coefficients,
+quadratic form, utilization and equivalent stress, and the exact wording of
+every validation message.
+
+Deliberate differences from the source, both to be confirmed when ANYsolver is
+stripped:
+
+- `IsotropicMaterial` validates on construction. `anysolver.fe_core.Material`
+  does not, so a caller that built a material with an inadmissible Poisson ratio
+  and never used it would now fail at construction instead of at first use.
+- Ramberg-Osgood is not implemented. It has no distinct yield point, so as a
+  flow curve its stress tends to zero as plastic strain does, which a return
+  mapping cannot use; the usual repairs produce a different curve while keeping
+  the name. `PowerLawHardeningCurve.from_yield` covers the same behaviour with an
+  explicit yield stress.
+
+Not included, and staying in ANYsolver: `FiberSectionPlasticityConfig` (a solver
+fiber grid, not a material) and all section properties.
+
+## 0.0.1
+
+- Repository scaffolding: packaging metadata, CI across Python 3.11-3.14 on
+  Windows and Linux, and the layering checks that keep the package a leaf of the
+  dependency graph.

@@ -1,0 +1,41 @@
+{
+  "source": "DNV-RP-C208 section 4.6.6 low-fractile true stress-strain values",
+  "reference": "DNV-RP-C208, September 2019, amended October 2022, section 4.6.6",
+  "fractile": "low",
+  "units": {
+    "stress": "MPa",
+    "thickness": "mm",
+    "strain": "-"
+  },
+  "elastic_modulus": 210000.0,
+  "default_eps_p_y1": 0.004,
+  "grades": {
+    "S235": [
+      {"thickness_from": 0.0, "thickness_to": 16.0, "sigma_prop": 211.7, "sigma_yield": 236.2, "sigma_yield_2": 243.4, "eps_p_y2": 0.020, "K": 520.0, "n": 0.166},
+      {"thickness_from": 16.0, "thickness_to": 40.0, "sigma_prop": 202.7, "sigma_yield": 226.1, "sigma_yield_2": 233.2, "eps_p_y2": 0.020, "K": 520.0, "n": 0.166},
+      {"thickness_from": 40.0, "thickness_to": 63.0, "sigma_prop": 193.7, "sigma_yield": 216.1, "sigma_yield_2": 223.0, "eps_p_y2": 0.020, "K": 520.0, "n": 0.166},
+      {"thickness_from": 63.0, "thickness_to": 100.0, "sigma_prop": 193.7, "sigma_yield": 216.1, "sigma_yield_2": 223.0, "eps_p_y2": 0.020, "K": 520.0, "n": 0.166}
+    ],
+    "S275": [
+      {"thickness_from": 0.0, "thickness_to": 16.0, "sigma_prop": 247.8, "sigma_yield": 276.5, "sigma_yield_2": 282.8, "eps_p_y2": 0.017, "K": 620.0, "n": 0.166},
+      {"thickness_from": 16.0, "thickness_to": 40.0, "sigma_prop": 238.8, "sigma_yield": 266.4, "sigma_yield_2": 272.6, "eps_p_y2": 0.017, "K": 620.0, "n": 0.166},
+      {"thickness_from": 40.0, "thickness_to": 63.0, "sigma_prop": 229.8, "sigma_yield": 256.3, "sigma_yield_2": 262.4, "eps_p_y2": 0.017, "K": 620.0, "n": 0.166}
+    ],
+    "S355": [
+      {"thickness_from": 0.0, "thickness_to": 16.0, "sigma_prop": 320.0, "sigma_yield": 357.0, "sigma_yield_2": 363.3, "eps_p_y2": 0.015, "K": 740.0, "n": 0.166},
+      {"thickness_from": 16.0, "thickness_to": 40.0, "sigma_prop": 311.0, "sigma_yield": 346.9, "sigma_yield_2": 353.1, "eps_p_y2": 0.015, "K": 740.0, "n": 0.166},
+      {"thickness_from": 40.0, "thickness_to": 63.0, "sigma_prop": 301.9, "sigma_yield": 336.9, "sigma_yield_2": 342.9, "eps_p_y2": 0.015, "K": 725.0, "n": 0.166},
+      {"thickness_from": 63.0, "thickness_to": 100.0, "sigma_prop": 283.9, "sigma_yield": 316.7, "sigma_yield_2": 322.5, "eps_p_y2": 0.015, "K": 725.0, "n": 0.166}
+    ],
+    "S420": [
+      {"thickness_from": 0.0, "thickness_to": 16.0, "sigma_prop": 378.7, "sigma_yield": 422.5, "sigma_yield_2": 427.6, "eps_p_y2": 0.012, "K": 738.0, "n": 0.140},
+      {"thickness_from": 16.0, "thickness_to": 40.0, "sigma_prop": 360.6, "sigma_yield": 402.4, "sigma_yield_2": 407.3, "eps_p_y2": 0.012, "K": 703.0, "n": 0.140},
+      {"thickness_from": 40.0, "thickness_to": 63.0, "sigma_prop": 351.6, "sigma_yield": 392.3, "sigma_yield_2": 397.1, "eps_p_y2": 0.012, "K": 686.0, "n": 0.140}
+    ],
+    "S460": [
+      {"thickness_from": 0.0, "thickness_to": 16.0, "sigma_prop": 414.8, "sigma_yield": 462.8, "sigma_yield_2": 466.9, "eps_p_y2": 0.010, "K": 772.0, "n": 0.120},
+      {"thickness_from": 16.0, "thickness_to": 40.0, "sigma_prop": 396.7, "sigma_yield": 442.7, "sigma_yield_2": 446.6, "eps_p_y2": 0.010, "K": 745.0, "n": 0.120},
+      {"thickness_from": 40.0, "thickness_to": 63.0, "sigma_prop": 374.2, "sigma_yield": 417.5, "sigma_yield_2": 421.2, "eps_p_y2": 0.010, "K": 703.0, "n": 0.120}
+    ]
+  }
+}
