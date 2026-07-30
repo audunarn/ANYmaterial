@@ -160,7 +160,7 @@ def test_library_lists_the_shipped_materials(capsys) -> None:
 
     assert code == 0
     names = [item["name"] for item in payload["materials"]]
-    assert len(names) == 19
+    assert len(names) == 33
     assert "S355 (t <= 16 mm)" in names
     assert "EN AW-6082-T6" in names
     assert payload["user_library"]
@@ -168,16 +168,17 @@ def test_library_lists_the_shipped_materials(capsys) -> None:
 
 def test_library_filters(capsys) -> None:
     _code, aluminium = _json_run(capsys, "--json", "library", "--category", "aluminium")
-    assert [item["name"] for item in aluminium["materials"]] == ["EN AW-6082-T6"]
+    assert len(aluminium["materials"]) == 4
+    assert "EN AW-6082-T6" in [item["name"] for item in aluminium["materials"]]
 
     _code, nonlinear = _json_run(capsys, "--json", "library", "--nonlinear")
-    assert len(nonlinear["materials"]) == 17
+    assert len(nonlinear["materials"]) == 20
 
-    _code, searched = _json_run(capsys, "--json", "library", "--search", "1.4404")
-    assert [item["name"] for item in searched["materials"]] == ["EN 1.4404 (316L)"]
+    _code, searched = _json_run(capsys, "--json", "library", "--search", "7075")
+    assert [item["name"] for item in searched["materials"]] == ["AA 7075-T6 wrought (indicative)"]
 
     _code, indicative = _json_run(capsys, "--json", "library", "--status", "indicative")
-    assert len(indicative["materials"]) == 2
+    assert len(indicative["materials"]) == 9
 
 
 def test_library_text_output_warns_about_indicative_values(capsys) -> None:
@@ -190,6 +191,27 @@ def test_library_text_output_warns_about_indicative_values(capsys) -> None:
     # caveat is printed every time rather than left in a README.
     assert "not a design value" in out
     assert "governing standard" in out
+
+
+def test_library_warns_harder_about_measured_means(capsys) -> None:
+    code, out = _run(capsys, "library", "--status", "measured")
+
+    assert code == 0
+    assert "S690 QL 12 mm plate (measured mean)" in out
+    # A campaign mean reads like an authoritative number and is unconservative
+    # as a design strength, so it gets the louder warning.
+    assert "MEAN of a test campaign" in out
+    assert "unconservative" in out
+
+
+def test_a_listing_of_only_tabulated_materials_says_so(capsys) -> None:
+    code, out = _run(capsys, "library", "--status", "tabulated")
+
+    assert code == 0
+    # The warning stays worth reading by not appearing when it does not apply.
+    assert "unconservative" not in out
+    assert "not a design value" not in out
+    assert "reproduced from a standard" in out
 
 
 def test_plot_writes_an_svg_with_one_curve_per_material(capsys, tmp_path) -> None:

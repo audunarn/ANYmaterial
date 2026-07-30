@@ -1,34 +1,490 @@
 {
   "format": "anymaterial.library",
   "version": 1,
-  "description": "Curated starting materials. Every entry names where its numbers came from.",
-  "disclaimer": "Values marked status='indicative' are typical published figures for the grade, not design values. Grade designations cover ranges that vary with product form, temper and thickness, and a design value must come from the governing standard or the mill certificate. Check before use.",
+  "description": "Curated starting materials. Every entry names where its numbers came from, and a derived entry records how it was derived.",
+  "disclaimer": "status='tabulated' is a standard's own table. status='measured' is the MEAN of a named test campaign and is NOT a characteristic or design value -- a mean yield exceeds the nominal and is unconservative if used as a design strength. status='indicative' is a typical published figure for the grade. Only 'tabulated' is a design value; check everything else against the governing standard or the mill certificate.",
   "materials": [
+    {
+      "name": "AA 6061-T6 wrought (indicative)",
+      "category": "aluminium",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 68900000000.0,
+        "poisson_ratio": 0.33
+      },
+      "density": 2700.0,
+      "yield_stress": 276000000.0,
+      "tensile_strength": 310000000.0,
+      "status": "indicative",
+      "standard": "ANSI H35 / Aluminum Standards and Data",
+      "source": "https://www.aluminum.org/resources/industry-standards",
+      "notes": "Typical room-temperature wrought-alloy values. These are widely corroborated typical room-temperature values, not minimums. The authoritative tables are in the Aluminum Association's licensed Aluminum Standards and Data, which this entry does not reproduce; take product-specific minimums from there or from a certificate."
+    },
+    {
+      "name": "AA 7075-T6 wrought (indicative)",
+      "category": "aluminium",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 71700000000.0,
+        "poisson_ratio": 0.33
+      },
+      "density": 2810.0,
+      "yield_stress": 503000000.0,
+      "tensile_strength": 572000000.0,
+      "status": "indicative",
+      "standard": "ANSI H35 / Aluminum Standards and Data",
+      "source": "https://www.aluminum.org/resources/industry-standards",
+      "notes": "Typical room-temperature values, not structural design minima. 7xxx alloys require explicit corrosion, fatigue and stress-corrosion checks."
+    },
+    {
+      "name": "EN AW-5083-H116 plate (marine, indicative)",
+      "category": "aluminium",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 70000000000.0,
+        "poisson_ratio": 0.33
+      },
+      "density": 2660.0,
+      "yield_stress": 215000000.0,
+      "tensile_strength": 305000000.0,
+      "status": "indicative",
+      "standard": "EN 485-2 / EN 1999-1-1",
+      "source": "https://www.chalcoaluminum.com/application/aluminum-marine/5083-marine-plate/",
+      "notes": "0.2% proof 215 MPa is the EN 485-2 minimum for H116 plate; tensile 305 MPa sits inside the 290-360 MPa range quoted for the temper. Elastic constants and density are the conventional wrought-aluminium values. Replace with EN 485-2 for the exact thickness or a mill certificate before design. The originally cited hydro.com page is dead and was replaced."
+    },
     {
       "name": "EN AW-6082-T6",
       "category": "aluminium",
       "symmetry": "isotropic",
-      "constants": {"elastic_modulus": 70.0e9, "poisson_ratio": 0.33},
+      "constants": {
+        "elastic_modulus": 70000000000.0,
+        "poisson_ratio": 0.33
+      },
       "density": 2700.0,
-      "yield_stress": 310.0e6,
-      "tensile_strength": 340.0e6,
+      "yield_stress": 310000000.0,
+      "tensile_strength": 340000000.0,
       "status": "indicative",
       "standard": "EN 573-3 / EN 755-2",
       "source": "https://www.thyssenkrupp-materials.co.uk/aluminium-6082.html",
       "notes": "0.2% proof 310 MPa and tensile 340 MPa from the supplier datasheet, which does not separate tempers; EN 1999-1-1 characteristic values for design are lower and depend on product form and thickness. Poisson ratio 0.33 is the conventional value for wrought aluminium. No hardening curve: none was available from a citable source."
     },
     {
+      "name": "EN-GJS-400-15 ductile iron (indicative)",
+      "category": "cast iron",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 169000000000.0,
+        "poisson_ratio": 0.275
+      },
+      "density": 7100.0,
+      "yield_stress": 250000000.0,
+      "tensile_strength": 400000000.0,
+      "status": "indicative",
+      "standard": "EN 1563",
+      "source": "https://www.ductile.org/didata/Section3/3intro.htm",
+      "notes": "Representative minimum strength class values with typical elastic constants. Casting section size and heat treatment matter; compression and tension behaviour need not be symmetric."
+    },
+    {
+      "name": "IM7/8552 UD lamina, RTD (measured mean)",
+      "category": "composite lamina",
+      "symmetry": "orthotropic",
+      "constants": {
+        "elastic_modulus_1": 162095737070.0,
+        "elastic_modulus_2": 8963184100.0,
+        "elastic_modulus_3": 8963184100.0,
+        "poisson_ratio_12": 0.316,
+        "poisson_ratio_13": 0.316,
+        "poisson_ratio_23": 0.45,
+        "shear_modulus_12": 4688434760.0,
+        "shear_modulus_13": 4688434760.0,
+        "shear_modulus_23": 3090753138.0
+      },
+      "density": 1580.0,
+      "yield_stress": 0.0,
+      "status": "measured",
+      "standard": "NMS 128/2 material spec, NPS 81228 'M' cure; ASTM D3039 / D3518",
+      "source": "https://www.wichita.edu/industry_and_defense/NIAR/Research/hexcel8552.php",
+      "notes": "Room-temperature-dry campaign means from the NCAMP/NIAR Hexcel 8552 IM7 unidirectional qualification programme, generated under FAA oversight. In-plane constants E1, E2, G12 and nu12 are measured; E3, nu13, G13, nu23 and G23 are NOT measured and follow from an assumed transverse isotropy about the fibre axis. Composite failure is not isotropic yielding, so this entry carries no yield stress and defines no failure criterion: take strengths and B-basis allowables from the statistical analysis report NCP-RP-2009-028. A campaign mean is not a design allowable.",
+      "measurement": {
+        "condition": "RTD (70 F, dry)",
+        "prepreg_lots": 3,
+        "elastic_modulus_1_cov": 0.0227,
+        "elastic_modulus_2_cov": 0.0337,
+        "shear_modulus_12_cov": 0.0327,
+        "fiber_volume_fraction": 0.573,
+        "cured_ply_thickness_m": 0.00018287999999999998,
+        "data_report": "NCAMP CAM-RP-2009-015 Rev A (22 April 2011), sections 2.3.1, 2.3.2, 2.3.5",
+        "statistics_report": "NCAMP NCP-RP-2009-028 Rev B (16 April 2019)",
+        "citation": "National Center for Advanced Materials Performance (NCAMP), National Institute for Aviation Research, Wichita State University. Hexcel 8552 IM7 Unidirectional Prepreg qualification: data report CAM-RP-2009-015 Rev A and statistical analysis report NCP-RP-2009-028 Rev B. Generated under FAA oversight per NCAMP SOP NSP 100."
+      },
+      "calculation": {
+        "measured": "E1, E2, G12, nu12 (RTD means, converted from Msi at 1 Msi = 6.894757 GPa)",
+        "assumption": "transverse isotropy about fibre axis 1: E3=E2, nu13=nu12, G13=G12",
+        "nu23": "assumed 0.45; not measured by the qualification programme",
+        "G23_formula": "E2/(2*(1+nu23)), exact for transverse isotropy"
+      }
+    },
+    {
+      "name": "EN 1.4462 (Duplex 2205) nonlinear indicative",
+      "category": "duplex stainless steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 200000000000.0,
+        "poisson_ratio": 0.3
+      },
+      "density": 7800.0,
+      "yield_stress": 450000000.0,
+      "tensile_strength": 650000000.0,
+      "hardening": {
+        "kind": "piecewise_linear",
+        "points": [
+          [
+            0.0,
+            450000000.0
+          ],
+          [
+            0.002777162,
+            474660660.3
+          ],
+          [
+            0.003831238,
+            497578796.9
+          ],
+          [
+            0.005209496,
+            520719241.8
+          ],
+          [
+            0.00699018,
+            544147486.2
+          ],
+          [
+            0.009265395,
+            567944705.0
+          ],
+          [
+            0.012142531,
+            592210628.4
+          ],
+          [
+            0.015745627,
+            617066791.9
+          ],
+          [
+            0.020216569,
+            642660195.1
+          ],
+          [
+            0.025716058,
+            669167402.9
+          ]
+        ]
+      },
+      "status": "indicative",
+      "standard": "EN 10088-4; curve form based on EN 1993-1-4 Annex C",
+      "source": "https://www.cedinox.es/en/publicaciones/documentos-online/Design-manual-for-structural-stainless-steel-4edition",
+      "notes": "Representative annealed duplex values. n=7 is assumed. Welding condition, product thickness and direction can materially change proof strength and ductility. The cited source supports the curve FORM (Ramberg-Osgood per EN 1993-1-4 Annex C) and the fy/fu inputs; the tabulated points below are computed from those, not taken from the source.",
+      "calculation": {
+        "model": "epsilon=sigma/E+0.002*(sigma/fy)^n",
+        "n": 7.0,
+        "conversion": "engineering to true stress/true plastic strain"
+      }
+    },
+    {
+      "name": "EN 1.4307 (304L) annealed, nonlinear indicative",
+      "category": "stainless steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 200000000000.0,
+        "poisson_ratio": 0.3
+      },
+      "density": 7900.0,
+      "yield_stress": 210000000.0,
+      "tensile_strength": 520000000.0,
+      "hardening": {
+        "kind": "piecewise_linear",
+        "points": [
+          [
+            0.0,
+            210000000.0
+          ],
+          [
+            0.004948326,
+            245959327.1
+          ],
+          [
+            0.010879307,
+            282337863.5
+          ],
+          [
+            0.021755544,
+            320738716.5
+          ],
+          [
+            0.040286085,
+            362731702.7
+          ],
+          [
+            0.069916862,
+            410745072.6
+          ],
+          [
+            0.114647728,
+            468378233.5
+          ],
+          [
+            0.178600004,
+            540782731.8
+          ],
+          [
+            0.265341909,
+            635118255.5
+          ],
+          [
+            0.3771179,
+            761090416.6
+          ]
+        ]
+      },
+      "status": "indicative",
+      "standard": "EN 10088-4; curve form based on EN 1993-1-4 Annex C",
+      "source": "https://op.europa.eu/en/publication-detail/-/publication/e45c27be-5bca-420e-8600-31db1aebfb84",
+      "notes": "Indicative Ramberg-Osgood engineering curve, converted to true stress versus true plastic strain. n=6 is an explicit modelling assumption; replace fy, fu and n with certificate/test values. The cited source supports the curve FORM (Ramberg-Osgood per EN 1993-1-4 Annex C) and the fy/fu inputs; the tabulated points below are computed from those, not taken from the source.",
+      "calculation": {
+        "model": "epsilon=sigma/E+0.002*(sigma/fy)^n",
+        "n": 6.0,
+        "conversion": "sigma_true=sigma_eng*(1+epsilon_eng); epsilon_p_true=ln(1+epsilon_eng)-sigma_true/E"
+      }
+    },
+    {
       "name": "EN 1.4404 (316L)",
       "category": "stainless steel",
       "symmetry": "isotropic",
-      "constants": {"elastic_modulus": 200.0e9, "poisson_ratio": 0.3},
+      "constants": {
+        "elastic_modulus": 200000000000.0,
+        "poisson_ratio": 0.3
+      },
       "density": 8000.0,
-      "yield_stress": 220.0e6,
-      "tensile_strength": 500.0e6,
+      "yield_stress": 220000000.0,
+      "tensile_strength": 500000000.0,
       "status": "indicative",
       "standard": "EN 10088-3",
       "source": "https://www.thyssenkrupp-materials.co.uk/stainless-steel-316l-14404.html",
       "notes": "Modulus 200 GPa and density 8000 kg/m3 from the supplier datasheet. 0.2% proof 220 MPa is the commonly quoted characteristic value for the grade; EN 10088-3 gives 500-700 MPa tensile, and the lower bound is used here. Austenitic stainless has markedly non-linear behaviour well below the proof stress, so a linear-elastic idealisation is conservative in stiffness terms only. No hardening curve: none was available from a citable source."
+    },
+    {
+      "name": "EN 1.4404 (316L) annealed, nonlinear indicative",
+      "category": "stainless steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 200000000000.0,
+        "poisson_ratio": 0.3
+      },
+      "density": 8000.0,
+      "yield_stress": 220000000.0,
+      "tensile_strength": 500000000.0,
+      "hardening": {
+        "kind": "piecewise_linear",
+        "points": [
+          [
+            0.0,
+            220000000.0
+          ],
+          [
+            0.005020456,
+            252694043.0
+          ],
+          [
+            0.011334374,
+            285847483.4
+          ],
+          [
+            0.023419356,
+            321273669.0
+          ],
+          [
+            0.044930047,
+            360924025.5
+          ],
+          [
+            0.080797226,
+            407990377.1
+          ],
+          [
+            0.137003718,
+            467469878.7
+          ],
+          [
+            0.219828351,
+            546904555.0
+          ],
+          [
+            0.334531086,
+            657328279.0
+          ],
+          [
+            0.483841078,
+            814456859.3
+          ]
+        ]
+      },
+      "status": "indicative",
+      "standard": "EN 10088-3; curve form based on EN 1993-1-4 Annex C",
+      "source": "https://www.cedinox.es/en/publicaciones/documentos-online/Design-manual-for-structural-stainless-steel-4edition",
+      "notes": "Adds a nonlinear counterpart to the existing elastic 316L entry. n=7 is an explicit assumption. Do not treat this as a certified batch curve. The cited source supports the curve FORM (Ramberg-Osgood per EN 1993-1-4 Annex C) and the fy/fu inputs; the tabulated points below are computed from those, not taken from the source.",
+      "calculation": {
+        "model": "epsilon=sigma/E+0.002*(sigma/fy)^n",
+        "n": 7.0,
+        "conversion": "engineering to true stress/true plastic strain"
+      }
+    },
+    {
+      "name": "A992 Gr.50 W14X82 flange (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 206225146099.0,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 393420906.5,
+      "status": "measured",
+      "standard": "grade A992 Gr. 50",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "W14X82 flange. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 5,
+        "yield_stress_cov": 0.0957,
+        "elastic_modulus_cov": 0.0509,
+        "campaign": "SuzukiExperimentalEvaluationSteel2021",
+        "product_form": "W14X82 flange",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
+    },
+    {
+      "name": "S235/S275 JR+AR 15 mm plate (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 187987230064.9,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 283546210.2,
+      "status": "measured",
+      "standard": "grade S235/275 JR+AR",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "15 mm plate. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 11,
+        "yield_stress_cov": 0.0424,
+        "elastic_modulus_cov": 0.0302,
+        "campaign": "Current",
+        "product_form": "15 mm plate",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
+    },
+    {
+      "name": "S355 J2+M IPE270 flange (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 212823253705.6,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 405217685.6,
+      "status": "measured",
+      "standard": "grade S355 J2+M",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "IPE270 flange. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 11,
+        "yield_stress_cov": 0.0557,
+        "elastic_modulus_cov": 0.076,
+        "campaign": "Current",
+        "product_form": "IPE270 flange",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
+    },
+    {
+      "name": "S355 J2+N 15 mm plate (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 191484049722.4,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 411727083.5,
+      "status": "measured",
+      "standard": "grade S355 J2+N",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "15 mm plate. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 11,
+        "yield_stress_cov": 0.0267,
+        "elastic_modulus_cov": 0.0273,
+        "campaign": "OzdenExperimentalinvestigationcyclic2021",
+        "product_form": "15 mm plate",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
+    },
+    {
+      "name": "S460 NL 25 mm plate (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 194991509177.9,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 447356504.1,
+      "status": "measured",
+      "standard": "grade S460 NL",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "25 mm plate. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 7,
+        "yield_stress_cov": 0.0285,
+        "elastic_modulus_cov": 0.1025,
+        "campaign": "GrigoriouCharacterizationcyclichardening2017",
+        "product_form": "25 mm plate",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
+    },
+    {
+      "name": "S690 QL 12 mm plate (measured mean)",
+      "category": "structural steel",
+      "symmetry": "isotropic",
+      "constants": {
+        "elastic_modulus": 198811037164.1,
+        "poisson_ratio": 0.3
+      },
+      "density": 7850.0,
+      "yield_stress": 776539611.0,
+      "status": "measured",
+      "standard": "grade S690 QL",
+      "source": "https://doi.org/10.5281/zenodo.6965147",
+      "notes": "12 mm plate. Campaign MEAN of measured tension coupons, not a characteristic or design value: the mean yield exceeds the grade's nominal yield, so using it as a design strength is unconservative. Intended for validating a nonlinear model against the tests it came from. Elastic modulus is the measured mean and carries real scatter.",
+      "measurement": {
+        "coupons": 10,
+        "yield_stress_cov": 0.0135,
+        "elastic_modulus_cov": 0.0605,
+        "campaign": "Current",
+        "product_form": "12 mm plate",
+        "license": "CC-BY-4.0",
+        "citation": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0."
+      }
     }
-  ]
+  ],
+  "attribution": {
+    "zenodo_coupon_database": "Hartloper, A. R., Ozden, S., de Castro e Sousa, A., & Lignos, D. G. (2022). Database of Uniaxial Cyclic and Tensile Coupon Tests for Structural Metallic Materials (v1.0.0) [Data set]. Zenodo. doi:10.5281/zenodo.6965147. Licensed CC-BY-4.0.",
+    "ncamp_hexcel_8552_im7": "National Center for Advanced Materials Performance (NCAMP), National Institute for Aviation Research, Wichita State University. Hexcel 8552 IM7 Unidirectional Prepreg qualification: data report CAM-RP-2009-015 Rev A and statistical analysis report NCP-RP-2009-028 Rev B. Generated under FAA oversight per NCAMP SOP NSP 100."
+  }
 }

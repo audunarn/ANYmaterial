@@ -74,12 +74,27 @@ _AUTOMATIC_ALIASES = frozenset({"auto", "automatic", "bythickness", "autobyplate
 STEEL_POISSON_RATIO = 0.3
 STEEL_DENSITY = 7850.0
 
-STATUSES = ("tabulated", "indicative", "user")
+# What kind of number an entry holds.  The distinction is the point of the
+# library: all three are useful and only one of them is a design value.
+#
+#   tabulated  a standard's own table, reproduced with the reference
+#   measured   the mean of a named test campaign -- a mean, not a characteristic
+#              value, and therefore unconservative if used as one
+#   indicative a typical published figure for the grade
+#   user       whatever the user added
+STATUSES = ("tabulated", "measured", "indicative", "user")
 
 
 @dataclass(frozen=True)
 class LibraryEntry:
-    """A material in the library, with the provenance of its numbers."""
+    """A material in the library, with the provenance of its numbers.
+
+    ``calculation`` records how a derived entry was derived -- the Ramberg-Osgood
+    exponent behind a tabulated curve, the transverse-isotropy assumption behind a
+    composite lamina's ``G23``.  It is carried rather than dropped because a
+    derived number whose derivation is not recorded cannot be checked, and an
+    assumption nobody can see is one nobody will question.
+    """
 
     spec: MaterialSpec
     category: str = "other"
@@ -88,10 +103,19 @@ class LibraryEntry:
     source: Optional[str] = None
     notes: Optional[str] = None
     tensile_strength: Optional[float] = None
+    calculation: Optional[Mapping[str, Any]] = None
+    measurement: Optional[Mapping[str, Any]] = None
 
     def __post_init__(self) -> None:
         if self.status not in STATUSES:
             raise ValueError(f"status must be one of {STATUSES}, not {self.status!r}")
+        if self.status == "measured" and not self.measurement:
+            # A measured value without its sample size and scatter is just a
+            # number claiming an authority it cannot show.
+            raise ValueError(
+                f"{self.name!r} is marked measured but carries no measurement record "
+                "(coupon count and coefficient of variation)"
+            )
 
     @property
     def name(self) -> str:
@@ -132,6 +156,10 @@ class LibraryEntry:
                 data[key] = value
         if self.tensile_strength is not None:
             data["tensile_strength"] = float(self.tensile_strength)
+        if self.calculation:
+            data["calculation"] = dict(self.calculation)
+        if self.measurement:
+            data["measurement"] = dict(self.measurement)
         return data
 
     @classmethod
@@ -146,6 +174,8 @@ class LibraryEntry:
             source=data.get("source"),
             notes=data.get("notes"),
             tensile_strength=None if tensile is None else float(tensile),
+            calculation=dict(data["calculation"]) if data.get("calculation") else None,
+            measurement=dict(data["measurement"]) if data.get("measurement") else None,
         )
 
 

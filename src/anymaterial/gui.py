@@ -198,10 +198,24 @@ class MaterialEditor(ttk.Frame):
             lines.append(f"source:   {entry.source}")
         if entry.tensile_strength:
             lines.append(f"tensile:  {entry.tensile_strength / _MPA:.0f} MPa")
-        if not entry.is_design_value:
-            # The whole risk this library carries is a looked-up number being
-            # used as a design value, so it is said on the entry itself.
+        if entry.measurement:
+            record = entry.measurement
+            lines.append(
+                f"measured: {record.get('coupons', '?')} coupons, "
+                f"yield CoV {float(record.get('yield_stress_cov', 0.0)):.1%}, "
+                f"E CoV {float(record.get('elastic_modulus_cov', 0.0)):.1%}"
+            )
+        if entry.status == "measured":
+            # The more dangerous of the two: a campaign mean reads like an
+            # authoritative number and is unconservative as a design strength.
+            lines.append("A CAMPAIGN MEAN, not a characteristic value - unconservative for design.")
+        elif not entry.is_design_value:
             lines.append("NOT a design value - verify against the governing standard.")
+        if entry.calculation:
+            # A derived number whose derivation is not shown cannot be checked.
+            lines.append("derived: " + "; ".join(
+                f"{key}={value}" for key, value in sorted(entry.calculation.items())
+            ))
         if entry.notes:
             lines.append("")
             lines.append(entry.notes)

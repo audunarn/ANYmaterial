@@ -62,14 +62,42 @@ happens to be indefinite.
 
 ## The library
 
-19 materials ship with the package, and every one names where its numbers came
-from:
+32 materials ship with the package, and every one names where its numbers came
+from and what kind of number it is:
 
 | Materials | Status | Source |
 | --- | --- | --- |
-| S235, S275, S355, S420, S460 — 17 grade/thickness rows, each with its flow curve | `tabulated` | DNV-RP-C208 section 4.6.6, low fractile |
-| EN AW-6082-T6 | `indicative` | [thyssenkrupp datasheet](https://www.thyssenkrupp-materials.co.uk/aluminium-6082.html) |
-| EN 1.4404 (316L) | `indicative` | [thyssenkrupp datasheet](https://www.thyssenkrupp-materials.co.uk/stainless-steel-316l-14404.html) |
+| S235, S275, S355, S420, S460 — 17 grade/thickness rows, each with its flow curve | `tabulated` | DNV-RP-C208 §4.6.6, low fractile |
+| S235/275, S355 (×2 product forms), S460, S690, A992 — campaign means with coupon counts and scatter | `measured` | [Zenodo coupon database](https://doi.org/10.5281/zenodo.6965147), CC-BY-4.0 |
+| IM7/8552 carbon-epoxy UD lamina, room-temperature dry — orthotropic | `measured` | [NCAMP/NIAR Hexcel 8552 qualification](https://www.wichita.edu/industry_and_defense/NIAR/Research/hexcel8552.php) |
+| EN AW-5083-H116, EN AW-6082-T6, AA 6061-T6, AA 7075-T6 | `indicative` | supplier and industry data |
+| EN 1.4404 (316L) elastic + nonlinear, EN 1.4307 (304L) nonlinear, EN 1.4462 duplex nonlinear | `indicative` | EN 10088; curves derived per EN 1993-1-4 Annex C |
+| EN-GJS-400-15 ductile iron | `indicative` | EN 1563 grade definition |
+
+Three kinds of number, and **only the first is a design value**:
+
+- **`tabulated`** — a standard's own table, reproduced with the reference.
+- **`measured`** — the **mean** of a named test campaign. A mean is not a
+  characteristic value: the measured mean yield of S355 is 412 MPa against a
+  357 MPa tabulated value, so using it as a design strength is *unconservative*.
+  It is here to validate a nonlinear model against the tests it came from. Each
+  entry carries its coupon count and coefficient of variation.
+- **`indicative`** — a typical published figure for the grade. A grade
+  designation covers a range that varies with product form, temper and thickness.
+
+The distinction is carried through the API (`LibraryEntry.is_design_value`), the
+CLI (which prints the warning matching the statuses actually listed) and the
+editor, because a library that presents all three identically invites the wrong
+one to be used.
+
+### Attribution
+
+The `measured` entries come from Hartloper, A. R., Ozden, S., de Castro e Sousa,
+A., & Lignos, D. G. (2022), *Database of Uniaxial Cyclic and Tensile Coupon Tests
+for Structural Metallic Materials* (v1.0.0), Zenodo,
+[doi:10.5281/zenodo.6965147](https://doi.org/10.5281/zenodo.6965147), licensed
+**CC-BY-4.0**. Each entry records the originating campaign citekey so the
+underlying experiments can be traced through the database's own reference list.
 
 **`tabulated` means the numbers are a standard's own table**, reproduced with the
 reference. **`indicative` means they are typical published figures and are not
@@ -79,6 +107,26 @@ what settles it. The distinction is carried through the API, the CLI and the
 editor rather than being left in a README, because a library that presents a
 looked-up number and a qualified number identically invites the first to be used
 as the second.
+
+A **derived** entry also records *how* it was derived, in `LibraryEntry.calculation`
+— the Ramberg-Osgood exponent behind a tabulated stainless curve, the
+transverse-isotropy assumption behind a lamina's `G23`. A derived number whose
+derivation is not recorded cannot be checked, and an assumption nobody can see is
+one nobody will question.
+
+Every shipped entry must name a source, a standard and its notes — there is a
+test that fails the build if one does not. Entries whose cited source turned out
+not to support their numbers have been removed rather than kept with a caveat;
+see the changelog for which, and why.
+
+**The one composite** is the IM7/8552 lamina, and it is careful about what it
+claims: `E1`, `E2`, `G12` and `nu12` are room-temperature-dry campaign means from
+the NCAMP qualification programme; `E3`, `nu13`, `G13`, `nu23` and `G23` are
+**not measured** and follow from an assumed transverse isotropy, with `nu23 = 0.45`
+assumed outright. `LibraryEntry.calculation` says exactly which is which. It
+carries no yield stress and defines no failure criterion — composite failure is
+not isotropic yielding, and strengths belong in the B-basis allowables report,
+not here.
 
 Materials you add go to `~/.anymaterial/materials.json`, or wherever
 `ANYMATERIAL_LIBRARY` points — a project that wants its materials beside its
@@ -169,4 +217,13 @@ MPa because that is how they are quoted on a drawing, and converts at the widget
 ```powershell
 python -m pip install -e "C:\Github\ANYmaterial[dev]"
 python -m pytest
+```
+
+To open the editor straight from a checkout — including an IDE's Run button, with
+nothing installed — run [`run_gui.py`](run_gui.py) at the repository root. It puts
+`src` on `sys.path` first, so what runs is this working tree rather than an
+installed copy.
+
+```bash
+python run_gui.py
 ```

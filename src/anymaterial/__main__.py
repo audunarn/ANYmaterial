@@ -16,6 +16,7 @@ import numpy as np
 
 from .contract import elastic_compliance_matrix, material_symmetry
 from .library import (
+    STATUSES,
     LibraryEntry,
     add_to_user_library,
     available_grades,
@@ -130,17 +131,36 @@ def _command_library(args: argparse.Namespace) -> int:
     if not entries:
         print("no materials match")
         return 0
-    print(f"{'material':<28} {'category':<18} {'status':<11} {'yield':>9}  hardening")
+    # Sized to the content: a fixed width truncated the longer alloy names into
+    # ambiguity, which is the one thing a material listing must not do.
+    name_width = max(len("material"), *(len(entry.name) for entry in entries))
+    category_width = max(len("category"), *(len(entry.category) for entry in entries))
+    print(
+        f"{'material':<{name_width}}  {'category':<{category_width}}  "
+        f"{'status':<10}  {'yield':>9}  hardening"
+    )
     for entry in entries:
         yield_mpa = f"{entry.spec.yield_stress / 1.0e6:.0f} MPa" if entry.spec.yield_stress else "-"
         hardening = entry.spec.hardening["kind"] if entry.spec.hardening else "elastic"
-        print(f"{entry.name:<28} {entry.category:<18} {entry.status:<11} {yield_mpa:>9}  {hardening}")
+        print(
+            f"{entry.name:<{name_width}}  {entry.category:<{category_width}}  "
+            f"{entry.status:<10}  {yield_mpa:>9}  {hardening}"
+        )
     print()
     print(f"user library: {user_library_path()}")
-    # Said every time the list is printed, because the whole risk is a looked-up
-    # number being used as a design value.
-    print("status 'indicative' means a typical published figure, not a design value:")
-    print("check it against the governing standard or the mill certificate.")
+    # Said every time the list is printed, because the whole risk this library
+    # carries is a looked-up number being used as a design value.  Only shown for
+    # the statuses actually listed, so the warning stays worth reading.
+    shown = {entry.status for entry in entries}
+    if "measured" in shown:
+        print("status 'measured' is the MEAN of a test campaign, NOT a characteristic value:")
+        print("the mean yield exceeds the nominal, so using it as a design strength is")
+        print("unconservative. Use it to validate a model against the tests it came from.")
+    if "indicative" in shown:
+        print("status 'indicative' means a typical published figure, not a design value:")
+        print("check it against the governing standard or the mill certificate.")
+    if shown <= {"tabulated"}:
+        print("all listed materials are 'tabulated': reproduced from a standard's own table.")
     return 0
 
 
@@ -258,7 +278,8 @@ def main(argv: Sequence[str] | None = None) -> int:
 
     catalogue = sub.add_parser("library", help="list the materials in the library")
     catalogue.add_argument("--category", help="filter by category, e.g. aluminium")
-    catalogue.add_argument("--status", choices=("tabulated", "indicative", "user"))
+    # Derived from the library's own list, so the two cannot drift apart.
+    catalogue.add_argument("--status", choices=STATUSES)
     catalogue.add_argument("--search", help="filter by name or category substring")
     catalogue.add_argument("--nonlinear", action="store_true", help="only materials with a flow curve")
 

@@ -157,7 +157,7 @@ def test_an_unrepresentable_curve_is_reported_rather_than_silently_dropped(edito
 def test_the_library_pane_lists_every_shipped_material(editor, root) -> None:
     root.update()
 
-    assert len(editor.library_names) == 19
+    assert len(editor.library_names) == 33
     assert "S355 (t <= 16 mm)" in editor.library_names
     assert "EN AW-6082-T6" in editor.library_names
 
@@ -178,6 +178,18 @@ def test_selecting_a_library_material_shows_where_its_numbers_came_from(editor, 
     tabulated = editor._provenance.cget("text")
     assert "DNV-RP-C208" in tabulated
     assert "NOT a design value" not in tabulated
+
+
+def test_a_measured_entry_shows_its_scatter_and_the_louder_warning(editor, root) -> None:
+    editor._tree.selection_set("S690 QL 12 mm plate (measured mean)")
+    root.update()
+
+    text = editor._provenance.cget("text")
+    assert "measured: 10 coupons" in text
+    assert "yield CoV 1.4%" in text
+    assert "E CoV 6.0%" in text
+    assert "CAMPAIGN MEAN" in text
+    assert "unconservative for design" in text
 
 
 def test_loading_a_library_material_fills_the_form(editor, root) -> None:
@@ -229,7 +241,7 @@ def test_filtering_the_library_pane(editor, root) -> None:
     editor._only_nonlinear.set(True)
     editor._refresh_library_tree()
     root.update()
-    assert len(editor.library_names) == 17
+    assert len(editor.library_names) == 20
     assert "EN AW-6082-T6" not in editor.library_names
 
 

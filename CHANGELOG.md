@@ -30,8 +30,83 @@ Added:
   material against the library selection. Buttons add the current material to the
   library and export the plotted curves to SVG.
 
-Two curated materials were added from sources found online. Their numbers are
-attributed in `data/materials.json` and marked `indicative`:
+**The shipped library is 32 materials.** It grew from 19 with a supplied
+candidate set, then shrank again when the citations were checked: seven entries
+were removed because their cited source does not support their numbers.
+
+**One composite is back, properly sourced.** `IM7/8552 UD lamina, RTD (measured
+mean)` uses room-temperature-dry campaign means from the
+[NCAMP/NIAR Hexcel 8552 IM7 unidirectional qualification programme](https://www.wichita.edu/industry_and_defense/NIAR/Research/hexcel8552.php),
+generated under FAA oversight — E1 23.51 Msi, E2 1.30 Msi, G12 0.68 Msi,
+nu12 0.316, read from data report CAM-RP-2009-015 Rev A sections 2.3.1/2.3.2/2.3.5
+with the environmental column resolved as RTD (70 °F, dry). The remaining five
+constants are **not measured**: E3, nu13 and G13 follow from assumed transverse
+isotropy, nu23 is assumed 0.45 outright, and G23 follows exactly from those. The
+`calculation` record says which is which. Internal check: nu21 by reciprocity is
+0.0175 against the programme's separately measured transverse-compression nu21 of
+0.024. It carries no yield stress and defines no failure criterion.
+
+Added `run_gui.py` at the repository root — an entry point for an IDE's Run
+button that puts `src` on `sys.path` first, so the editor opens from a bare
+checkout with nothing installed, and what runs is the working tree rather than an
+installed copy. There is a test that executes it.
+
+Added a new status, **`measured`**, and six entries under it from the
+[Zenodo coupon database](https://doi.org/10.5281/zenodo.6965147) (Hartloper,
+Ozden, de Castro e Sousa & Lignos 2022, v1.0.0, **CC-BY-4.0**): S235/275 JR+AR
+15 mm plate, S355 J2+N 15 mm plate, S355 J2+M IPE270 flange, S460 NL 25 mm plate,
+S690 QL 12 mm plate and A992 Gr.50 W14X82 flange. Each is the mean of a named
+campaign and carries its coupon count, the coefficient of variation on both yield
+and modulus, the product form, the campaign citekey, the licence and the full
+citation.
+
+A `measured` entry is **not** a design value and says so loudly: the measured
+mean yield of S355 is 412 MPa against 357 MPa tabulated, so using a mean as a
+design strength is unconservative. `LibraryEntry` refuses `status="measured"`
+without a measurement record — a measured value without its sample size and
+scatter is a number claiming an authority it cannot show.
+
+Removed, each after checking the cited source:
+
+| Entry | Why |
+| --- | --- |
+| T300/5208 UD lamina | cited NASA report is *Space Radiation Effects on Graphite-Epoxy* and covers T300/**934** |
+| E-glass/epoxy UD lamina | cited NASA report is *Thermal expansion properties of composite materials* |
+| IM7/8552 UD lamina | the entry's own notes admitted the citation does not source its elastic constants |
+| Norway spruce | Poisson ratios 0.37/0.47/0.44 are the Wood Handbook's **Sitka** spruce row, and the moduli match neither species |
+| Titanium Grade 2 | cited TIMET datasheet URL returns HTTP 404 |
+| Ti-6Al-4V Grade 5 | cited TIMET datasheet URL returns HTTP 404 |
+| EN AW-6082-T6 extrusion | cited hydro.com URL returns HTTP 404, and a verified 6082-T6 entry already ships |
+
+Re-sourced rather than removed:
+
+- **EN AW-5083-H116** — dead hydro.com link replaced; the 215 MPa proof is
+  confirmed as the EN 485-2 minimum for the temper.
+- **AA 6061-T6, AA 7075-T6** — no longer cite a licensed table as if it were the
+  source; the notes now say plainly that these are widely corroborated typical
+  values and that the authoritative minimums are elsewhere.
+- **The three nonlinear stainless/duplex curves** — the notes now separate what
+  the source supports (the Ramberg-Osgood form per EN 1993-1-4 Annex C, and the
+  fy/fu inputs) from what was computed here (the tabulated points).
+
+Everything that survived was validated before merging: it builds, its compliance
+is symmetric and positive definite, and every flow curve is finite, monotonic and
+has a non-negative hardening modulus.
+
+- `LibraryEntry` gained **`calculation`** (how a derived entry was derived — the
+  Ramberg-Osgood exponent behind a tabulated curve) and **`measurement`** (coupon
+  count, scatter, campaign, licence, citation). Without the first, the candidate
+  set's derivation records would have been silently dropped on import.
+- A test now fails the build if any shipped entry lacks a source, a standard or
+  notes.
+- `anymaterial library` prints only the warning matching the statuses actually
+  listed, so it stays worth reading, and takes `--status measured`. The choices
+  are derived from the library's own status list so the two cannot drift.
+- `anymaterial library` sizes its name column to the content, because a fixed
+  width truncated the longer alloy names into ambiguity.
+
+The first two curated materials were added from sources found online. Their
+numbers are attributed in `data/materials.json` and marked `indicative`:
 
 - **EN AW-6082-T6** — E 70 GPa, 0.2% proof 310 MPa, tensile 340 MPa, density
   2700 kg/m³, from the thyssenkrupp datasheet. That datasheet does not separate
