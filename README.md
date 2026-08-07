@@ -4,9 +4,9 @@ Structural material models for finite-element analysis: isotropic and
 orthotropic elasticity, nonlinear hardening curves, and directional yield
 criteria, with a small tkinter editor and a command-line interface.
 
-```powershell
-python -m pip install ANYmaterial
-```
+After the first package-index release, install with
+`python -m pip install ANYmaterial`. Until then, use the editable development
+setup below.
 
 The distribution is `ANYmaterial` and the import package is `anymaterial`.
 
@@ -17,7 +17,7 @@ import anymaterial as am
 
 # Browse the library.
 catalogue = am.library()
-catalogue.names                      # 19 shipped materials
+catalogue.names                      # 33 shipped materials
 catalogue.find(category="aluminium")
 catalogue.get("S355 (16 < t <= 40 mm)").build()
 
@@ -62,7 +62,7 @@ happens to be indefinite.
 
 ## The library
 
-32 materials ship with the package, and every one names where its numbers came
+33 materials ship with the package, and every one names where its numbers came
 from and what kind of number it is:
 
 | Materials | Status | Source |
@@ -158,6 +158,18 @@ entry, and the flow curves — the material being edited plotted against whateve
 is selected, so a new material is seen against the grades it should sit near.
 Buttons load a library material into the form, add the current one to your
 library, and export the plotted curves to SVG.
+
+Applications can use the same editor as a real picker.  The optional callback
+adds a **Use material** button and receives a validated `MaterialSpec`:
+
+```python
+from anymaterial.gui import open_material_editor
+
+window, editor = open_material_editor(root, on_apply=material_dropdown.add)
+```
+
+This keeps material validation and unit conversion in ANYmaterial while the
+host decides how its dropdown or project model stores the selected material.
 
 ## Scope
 

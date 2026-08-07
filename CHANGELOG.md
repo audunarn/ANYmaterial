@@ -4,9 +4,12 @@
 
 Added:
 
-- **A material library.** `library()` returns 19 named materials: the 17
-  DNV-RP-C208 grade and thickness-class rows, each with its flow curve, plus two
-  curated entries. `MaterialLibrary` supports `get`, `find` (by category, status,
+- **Embeddable material selection.** `MaterialEditor(on_apply=...)` adds a
+  **Use material** button, and `open_material_editor` opens the same validated
+  editor inside an application's existing Tk event loop.
+- **A material library.** `library()` returns 33 named materials, including the
+  17 DNV-RP-C208 grade and thickness-class rows, curated cited entries, and
+  measured campaign means. `MaterialLibrary` supports `get`, `find` (by category, status,
   text or whether it has a curve), `add`, `remove` and JSON round-tripping;
   `LibraryEntry` carries the category, the standard, the source and free notes.
 - **Provenance as a first-class field.** Every entry has a `status`:
@@ -30,7 +33,7 @@ Added:
   material against the library selection. Buttons add the current material to the
   library and export the plotted curves to SVG.
 
-**The shipped library is 32 materials.** It grew from 19 with a supplied
+**The shipped library is 33 materials.** It grew from 19 with a supplied
 candidate set, then shrank again when the citations were checked: seven entries
 were removed because their cited source does not support their numbers.
 

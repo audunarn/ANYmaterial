@@ -206,6 +206,41 @@ def test_loading_a_library_material_fills_the_form(editor, root) -> None:
     assert "valid isotropic material" in editor.status_text
 
 
+def test_embedded_editor_applies_a_valid_material_to_the_host(root) -> None:
+    from anymaterial.gui import MaterialEditor
+
+    received = []
+    frame = MaterialEditor(root, on_apply=received.append)
+    frame.pack(fill="both", expand=True)
+    root.update()
+
+    frame._material_name.set("Host selection")
+    root.update()
+    frame.apply()
+
+    assert received == [frame.spec]
+    assert frame.applied_spec == frame.spec
+    assert received[0].name == "Host selection"
+    frame.destroy()
+    root.update()
+
+
+def test_open_material_editor_returns_a_hosted_picker(root) -> None:
+    from anymaterial.gui import open_material_editor
+
+    received = []
+    window, frame = open_material_editor(root, on_apply=received.append, title="Material picker")
+    root.update()
+
+    frame.apply()
+
+    assert window.title() == "Material picker"
+    assert frame.master is window
+    assert received == [frame.spec]
+    window.destroy()
+    root.update()
+
+
 def test_the_plot_compares_the_edited_material_with_the_selection(editor, root) -> None:
     editor._hardening_kind.set("dnv_c208")
     editor._rebuild_hardening_fields()

@@ -76,3 +76,6 @@ def test_run_gui_bootstraps_without_an_install() -> None:
     namespace = runpy.run_path(str(script), run_name="not_main")
     assert callable(namespace["main"])
     assert namespace["main"].__module__ == "anymaterial.gui"
+    assert 'if __name__ == "__main__":\n    raise SystemExit(main())' in script.read_text(
+        encoding="utf-8"
+    )

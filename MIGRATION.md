@@ -52,7 +52,7 @@ it.
 
 ## Deliberate behavioural differences
 
-Both need confirming when ANYsolver is stripped:
+Both were reviewed during the coordinated strip:
 
 - **`IsotropicMaterial` validates on construction.** `anysolver.fe_core.Material`
   does not. `OrthotropicMaterial` always did, so this makes the two consistent,
@@ -80,8 +80,8 @@ Both need confirming when ANYsolver is stripped:
 
 ## Import changes
 
-Applied when ANYsolver is stripped, not before. Until then ANYsolver keeps its
-own copies and remains the authority.
+Applied in ANYsolver 0.2. ANYmaterial is now authoritative for these
+implementations; ANYsolver retains compatibility facades only.
 
 | Previous import | Replacement |
 | --- | --- |
@@ -90,5 +90,5 @@ own copies and remains the authority.
 | `anysolver.fe_core.Material` | `anymaterial.IsotropicMaterial` |
 | `anyfem.model.materials.Material` | `anymaterial.MaterialSpec` |
 
-ANYsolver will re-export the old names through its `0.2.x` line with a
+ANYsolver re-exports the old names through its `0.2.x` line with a
 `DeprecationWarning`.

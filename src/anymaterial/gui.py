@@ -24,7 +24,7 @@ from __future__ import annotations
 
 import tkinter as tk
 from tkinter import filedialog, messagebox, simpledialog, ttk
-from typing import Any, Dict, List, Optional, Sequence, Tuple
+from typing import Any, Callable, Dict, List, Optional, Sequence, Tuple
 
 import numpy as np
 
@@ -42,7 +42,7 @@ from .reductions import beam_material_properties, shell_material_matrices
 from .spec import MaterialSpec, load_specs, save_specs
 from .validation import material_validation_errors
 
-__all__ = ["MaterialEditor", "main"]
+__all__ = ["MaterialEditor", "open_material_editor", "main"]
 
 
 _SYMMETRIES = ("isotropic", "orthotropic")
@@ -98,13 +98,21 @@ _STATUS_COLOURS = {
 class MaterialEditor(ttk.Frame):
     """The library browser and editor, as a frame so it can be embedded."""
 
-    def __init__(self, master: tk.Misc) -> None:
+    def __init__(
+        self,
+        master: tk.Misc,
+        *,
+        initial_spec: Optional[MaterialSpec] = None,
+        on_apply: Optional[Callable[[MaterialSpec], None]] = None,
+    ) -> None:
         super().__init__(master, padding=8)
         self._constant_vars: Dict[str, tk.StringVar] = {}
         self._hardening_vars: Dict[str, tk.StringVar] = {}
         self._current_spec: Optional[MaterialSpec] = None
         self._message: str = ""
         self._library: MaterialLibrary = library()
+        self._on_apply = on_apply
+        self._applied_spec: Optional[MaterialSpec] = None
 
         self.columnconfigure(2, weight=1)
         self.rowconfigure(0, weight=1)
@@ -114,6 +122,8 @@ class MaterialEditor(ttk.Frame):
         self._rebuild_constant_fields()
         self._rebuild_hardening_fields()
         self._refresh_library_tree()
+        if initial_spec is not None:
+            self.write_spec(initial_spec)
 
     # --------------------------------------------------------------- library
 
@@ -324,6 +334,8 @@ class MaterialEditor(ttk.Frame):
         buttons.grid(row=row, column=0, columnspan=2, sticky="ew", pady=(8, 0))
         ttk.Button(buttons, text="Load file...", command=self.load).pack(side="left")
         ttk.Button(buttons, text="Save as...", command=self.save).pack(side="left", padx=4)
+        if self._on_apply is not None:
+            ttk.Button(buttons, text="Use material", command=self.apply).pack(side="left")
 
     def _labelled_entry(
         self, parent: tk.Misc, row: int, label: str, default: str, *, width: int = 16
@@ -422,6 +434,28 @@ class MaterialEditor(ttk.Frame):
         """The valid specification the form describes, or ``None``."""
 
         return self._current_spec
+
+    @property
+    def applied_spec(self) -> Optional[MaterialSpec]:
+        """The last specification sent to the embedding application, if any."""
+
+        return self._applied_spec
+
+    def apply(self) -> None:
+        """Send the current valid material to the embedding application.
+
+        The editor remains useful as a standalone window, but an application can
+        pass ``on_apply=`` and put a real material picker behind a dropdown
+        instead of translating widget internals itself.
+        """
+
+        if self._current_spec is None:
+            messagebox.showerror("Use material", "the material is not valid; fix it first")
+            return
+        self._applied_spec = self._current_spec
+        self.event_generate("<<MaterialApplied>>")
+        if self._on_apply is not None:
+            self._on_apply(self._current_spec)
 
     @property
     def library_names(self) -> Tuple[str, ...]:
@@ -673,6 +707,28 @@ class MaterialEditor(ttk.Frame):
             save_specs(path, [self._current_spec], overwrite=True)
         except OSError as error:
             messagebox.showerror("Save failed", str(error))
+
+
+def open_material_editor(
+    master: tk.Misc,
+    *,
+    initial_spec: Optional[MaterialSpec] = None,
+    on_apply: Optional[Callable[[MaterialSpec], None]] = None,
+    title: str = "ANYmaterial",
+) -> Tuple[tk.Toplevel, MaterialEditor]:
+    """Open an embeddable editor and return its window and frame.
+
+    ``on_apply`` is called when the user presses **Use material**.  Returning the
+    frame as well as the window keeps the helper easy to test and lets a host
+    inspect ``editor.spec`` without reaching through Tk's widget registry.
+    """
+
+    window = tk.Toplevel(master)
+    window.title(title)
+    window.minsize(1180, 560)
+    editor = MaterialEditor(window, initial_spec=initial_spec, on_apply=on_apply)
+    editor.pack(fill="both", expand=True)
+    return window, editor
 
 
 def main(argv: Optional[List[str]] = None) -> int:
