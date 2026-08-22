@@ -18,6 +18,8 @@ Changed:
   local temporary directory, and tests that create a real Tk window are opt-in
   through `ANYMATERIAL_RUN_GUI_TESTS=1`. Windows CI opts in so the full editor
   suite remains a required release gate.
+- **Current GitHub Actions runtime.** Checkout and Python setup use their Node
+  24-based v7 actions, removing the Node 20 deprecation from CI and publication.
 
 ## 0.1.0 - 2026-08-20
 
