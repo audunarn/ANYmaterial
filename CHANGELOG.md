@@ -4,6 +4,28 @@
 
 Added:
 
+- **Ecosystem governance.** The canonical `ECOSYSTEM_GUIDE.md` records domain
+  ownership, compatibility, qualification and patch-only release rules shared
+  by the ANY repositories.
+
+Changed:
+
+- **Safer publication.** The Trusted Publishing workflow now checks metadata
+  and artifact contents, installs and smoke-tests the built wheel, rejects a
+  mismatched release tag, blocks prerelease publication and limits OIDC to the
+  publishing jobs. `RELEASING.md` records the TestPyPI and production procedure.
+- **Concurrent test isolation.** Each pytest run receives a unique repository-
+  local temporary directory, and tests that create a real Tk window are opt-in
+  through `ANYMATERIAL_RUN_GUI_TESTS=1`. Windows CI opts in so the full editor
+  suite remains a required release gate.
+
+## 0.1.0 - 2026-08-20
+
+First public feature release. The material code is extracted from ANYsolver and
+ANYfem; see [MIGRATION.md](MIGRATION.md) for provenance.
+
+Added:
+
 - **Embeddable material selection.** `MaterialEditor(on_apply=...)` adds a
   **Use material** button, and `open_material_editor` opens the same validated
   editor inside an application's existing Tk event loop.
@@ -124,10 +146,7 @@ Nothing was invented to fill the gap: an aluminium entry (EN AW-5083-H111) was
 prepared and then dropped when both candidate sources returned HTTP 403 and the
 numbers could not be verified.
 
-## 0.1.0
-
-First feature release. The material code is extracted from ANYsolver and
-ANYfem; see [MIGRATION.md](MIGRATION.md) for provenance.
+### Initial package foundation
 
 Added:
 

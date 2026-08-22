@@ -22,7 +22,12 @@ jobs:
       - run: python -m pip install --upgrade pip
       - run: python -m pip install -e ".[dev]"
       - run: python -c "import anymaterial; print(anymaterial.__version__)"
-      - run: python -m pytest
+      - name: Run tests
+        env:
+          # Linux runners have no display. Windows CI exercises the real Tk
+          # widgets; ordinary local runs remain window-free unless opted in.
+          ANYMATERIAL_RUN_GUI_TESTS: ${{ runner.os == 'Windows' && '1' || '0' }}
+        run: python -m pytest
 
   # A wheel built from a clean checkout, installed on its own, importing
   # without the repository on sys.path.  Catches the packaging mistakes that

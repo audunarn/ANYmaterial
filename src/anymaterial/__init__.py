@@ -81,7 +81,7 @@ from .yield_criteria import (
     hill48_strengths,
 )
 
-__version__ = "0.1.0"
+__version__ = "0.1.1"
 
 __all__ = [
     "BeamMaterialProperties",

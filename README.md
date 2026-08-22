@@ -4,9 +4,13 @@ Structural material models for finite-element analysis: isotropic and
 orthotropic elasticity, nonlinear hardening curves, and directional yield
 criteria, with a small tkinter editor and a command-line interface.
 
-After the first package-index release, install with
-`python -m pip install ANYmaterial`. Until then, use the editable development
-setup below.
+Install from PyPI with:
+
+```console
+python -m pip install ANYmaterial
+```
+
+For work on the package itself, use the editable development setup below.
 
 The distribution is `ANYmaterial` and the import package is `anymaterial`.
 
@@ -230,6 +234,9 @@ MPa because that is how they are quoted on a drawing, and converts at the widget
 python -m pip install -e "C:\Github\ANYmaterial[dev]"
 python -m pytest
 ```
+
+Release maintainers should follow [RELEASING.md](RELEASING.md) for the
+TestPyPI rehearsal, Trusted Publishing setup, and production checklist.
 
 To open the editor straight from a checkout — including an IDE's Run button, with
 nothing installed — run [`run_gui.py`](run_gui.py) at the repository root. It puts

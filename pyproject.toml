@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ANYmaterial"
-version = "0.1.0"
+version = "0.1.1"
 description = "Structural material models: isotropic and orthotropic elasticity, nonlinear hardening curves"
 readme = "README.md"
 requires-python = ">=3.11"
@@ -63,6 +63,6 @@ anymaterial = ["data/*.json"]
 testpaths = ["tests"]
 python_files = ["test_*.py"]
 pythonpath = ["src"]
-# A repository-local basetemp, because the user temp directory is not always
-# writable by the test process on Windows.  Gitignored, and pytest prunes it.
-addopts = ["-ra", "-p", "no:cacheprovider", "--basetemp=.pytest_tmp"]
+# tests/conftest.py assigns a unique, gitignored repository-local basetemp so
+# concurrent runs never fight over one Windows directory.
+addopts = ["-ra", "-p", "no:cacheprovider"]
