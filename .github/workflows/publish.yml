@@ -14,7 +14,7 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v7
@@ -78,6 +78,8 @@ jobs:
               "/src/anymaterial/data/materials.json",
           ):
               assert any(name.endswith(suffix) for name in sdist_names), suffix
+      - name: Generate release checksums
+        run: cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS
       - uses: actions/upload-artifact@v4
         with:
           name: python-package-distributions
@@ -129,7 +131,6 @@ jobs:
       github.event_name == 'release' &&
       github.event.release.draft == false &&
       github.event.release.prerelease == false
-    needs: verify
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -138,8 +139,31 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
-        with:
-          name: python-package-distributions
-          path: dist/
+      - name: Download prebuilt release assets
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: gh release download '${{ github.event.release.tag_name }}' --repo '${{ github.repository }}' --dir release --pattern '*.whl' --pattern '*.tar.gz' --pattern 'SHA256SUMS'
+      - name: Verify exact release artifact set and hashes
+        shell: python
+        run: |
+          import hashlib
+          import re
+          from pathlib import Path
+          root = Path("release")
+          artifacts = sorted(path for path in root.iterdir() if path.name != "SHA256SUMS")
+          assert len(artifacts) == 2
+          assert sum(path.suffix == ".whl" for path in artifacts) == 1
+          assert sum(path.name.endswith(".tar.gz") for path in artifacts) == 1
+          entries = {}
+          for line in (root / "SHA256SUMS").read_text(encoding="ascii").splitlines():
+              match = re.fullmatch(r"([0-9a-fA-F]{64})  ([^/\\]+)", line)
+              assert match is not None and match.group(2) not in entries
+              entries[match.group(2)] = match.group(1).lower()
+          assert set(entries) == {path.name for path in artifacts}
+          for path in artifacts:
+              assert path.is_file()
+              assert hashlib.sha256(path.read_bytes()).hexdigest() == entries[path.name]
+          Path("dist").mkdir()
+          for path in artifacts:
+              Path("dist", path.name).write_bytes(path.read_bytes())
       - uses: pypa/gh-action-pypi-publish@release/v1
