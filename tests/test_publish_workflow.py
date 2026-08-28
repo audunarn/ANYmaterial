@@ -5,6 +5,7 @@ import io
 import json
 import os
 from pathlib import Path
+import re
 import shlex
 import subprocess
 import sys
@@ -31,6 +32,8 @@ PUBLISH_ACTION = (
     "pypa/gh-action-pypi-publish@"
     "dc37677b2e1c63e2034f94d8a5b11f265b73ba33"
 )
+UPLOAD_ACTION = "actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02"
+DOWNLOAD_ACTION = "actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093"
 
 
 def _git(repository: Path, *arguments: str) -> str:
@@ -383,6 +386,26 @@ def test_manual_testpypi_path_remains_separate() -> None:
     workflow = (ROOT / ".github/workflows/publish.yml").read_text(encoding="utf-8")
     assert "repository-url: https://test.pypi.org/legacy/" in workflow
     assert "sha256sum *.whl *.tar.gz > SHA256SUMS" in workflow
+
+
+def test_all_workflow_actions_are_exactly_pinned() -> None:
+    workflows = sorted((ROOT / ".github/workflows").glob("*.yml"))
+    uses = []
+    for path in workflows:
+        for line in path.read_text(encoding="utf-8").splitlines():
+            match = re.match(r"^\s*(?:-\s*)?uses:\s*(\S+)", line)
+            if match:
+                uses.append(match.group(1))
+
+    assert uses
+    assert all(re.fullmatch(r"[^@\s]+@[0-9a-f]{40}", value) for value in uses)
+    assert set(uses) == {
+        CHECKOUT_ACTION,
+        SETUP_ACTION,
+        UPLOAD_ACTION,
+        DOWNLOAD_ACTION,
+        PUBLISH_ACTION,
+    }
 
 
 def test_release_authority_accepts_exact_ledger_bound_artifacts(tmp_path: Path) -> None:
