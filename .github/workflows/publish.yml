@@ -14,27 +14,17 @@ concurrency:
 
 jobs:
   build:
-    if: github.event_name == 'release' || github.ref == 'refs/heads/main'
+    if: github.event_name == 'workflow_dispatch' && github.ref == 'refs/heads/main'
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v7
+      - uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7
         with:
           persist-credentials: false
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.x"
       - name: Install build tools
         run: python -m pip install --upgrade build twine
-      - name: Verify release tag matches package version
-        if: github.event_name == 'release'
-        env:
-          RELEASE_TAG: ${{ github.event.release.tag_name }}
-        run: |
-          package_version="$(python -c 'import tomllib; print(tomllib.load(open("pyproject.toml", "rb"))["project"]["version"])')"
-          if [ "$RELEASE_TAG" != "v$package_version" ]; then
-            echo "Release tag $RELEASE_TAG does not match package version $package_version (expected v$package_version)."
-            exit 1
-          fi
       - name: Build distributions
         run: python -m build
       - name: Check distribution metadata
@@ -78,7 +68,9 @@ jobs:
               "/src/anymaterial/data/materials.json",
           ):
               assert any(name.endswith(suffix) for name in sdist_names), suffix
-      - uses: actions/upload-artifact@v4
+      - name: Generate release checksums
+        run: cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS
+      - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
         with:
           name: python-package-distributions
           path: dist/
@@ -87,10 +79,10 @@ jobs:
     needs: build
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/setup-python@v7
+      - uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7
         with:
           python-version: "3.12"
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: python-package-distributions
           path: dist/
@@ -116,11 +108,11 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - uses: actions/download-artifact@d3f86a106a0bac45b974a628896c90dbdf5c8093 # v4
         with:
           name: python-package-distributions
           path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+      - uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
         with:
           repository-url: https://test.pypi.org/legacy/
 
@@ -129,7 +121,6 @@ jobs:
       github.event_name == 'release' &&
       github.event.release.draft == false &&
       github.event.release.prerelease == false
-    needs: verify
     runs-on: ubuntu-latest
     environment:
       name: pypi
@@ -138,8 +129,39 @@ jobs:
       contents: read
       id-token: write
     steps:
-      - uses: actions/download-artifact@v4
+      - name: Check out the ledger-only release tag
+        uses: actions/checkout@3d3c42e5aac5ba805825da76410c181273ba90b1 # v7.0.1
         with:
-          name: python-package-distributions
-          path: dist/
-      - uses: pypa/gh-action-pypi-publish@release/v1
+          ref: ${{ github.event.release.tag_name }}
+          fetch-depth: 0
+          persist-credentials: false
+      - name: Set up Python
+        uses: actions/setup-python@5fda3b95a4ea91299a34e894583c3862153e4b97 # v7.0.0
+        with:
+          python-version: "3.13"
+      - name: Download the complete prebuilt release asset set
+        env:
+          GH_TOKEN: ${{ github.token }}
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          mkdir release-assets
+          gh release download "$RELEASE_TAG" --repo "$GITHUB_REPOSITORY" --dir release-assets
+      - name: Verify sole-child ledger authority and exact distributions
+        env:
+          RELEASE_TAG: ${{ github.event.release.tag_name }}
+        run: |
+          python tools/verify_release_authority.py \
+            --ledger docs/release/anymaterial-0.1.1-ledger.json \
+            --assets release-assets \
+            --output dist \
+            --tag "$RELEASE_TAG" \
+            --protected-ref refs/remotes/origin/main \
+            --expected-terminal ACCEPTED_ANYMATERIAL_0_1_1_RELEASE \
+            --distribution ANYmaterial \
+            --version 0.1.1 \
+            --artifact anymaterial-0.1.1-py3-none-any.whl \
+            --artifact anymaterial-0.1.1.tar.gz
+      - name: Publish exact ledger-authorized distributions
+        uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
+        with:
+          packages-dir: dist/

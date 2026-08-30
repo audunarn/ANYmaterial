@@ -2,6 +2,10 @@
 
 ## Unreleased
 
+No changes yet.
+
+## 0.1.1 - 2026-08-28
+
 Added:
 
 - **Ecosystem governance.** The canonical `ECOSYSTEM_GUIDE.md` records domain
