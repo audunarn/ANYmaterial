@@ -35,9 +35,9 @@ creating the production GitHub release.
 
 ## TestPyPI rehearsal
 
-1. Verify that `main` is clean, version `0.1.1` appears in both
+1. Verify that `main` is clean, version `0.2.0` appears in both
    `pyproject.toml` and `anymaterial.__version__`, the changelog has a dated
-   `0.1.1` section with no release changes left under `Unreleased`, and the
+   `0.2.0` section with no release changes left under `Unreleased`, and the
    **Tests** workflow is green.
 2. Run the **Publish** workflow manually from the `main` branch. From a GitHub
    CLI authenticated for the repository:
@@ -53,10 +53,10 @@ creating the production GitHub release.
    ```console
    python -m venv .venv-testpypi
    .venv-testpypi\Scripts\python -m pip install --upgrade pip
-   .venv-testpypi\Scripts\python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ ANYmaterial==0.1.1
+   .venv-testpypi\Scripts\python -m pip install --index-url https://test.pypi.org/simple/ --extra-index-url https://pypi.org/simple/ ANYmaterial==0.2.0
    .venv-testpypi\Scripts\anymaterial --help
    .venv-testpypi\Scripts\anymaterial --json library
-   .venv-testpypi\Scripts\python -c "import anymaterial as am; assert am.__version__ == '0.1.1'; assert len(am.library().names) == 33"
+   .venv-testpypi\Scripts\python -c "import anymaterial as am; assert am.__version__ == '0.2.0'; assert len(am.library().names) == 33"
    ```
 
    On POSIX systems, replace `.venv-testpypi\Scripts\` with
@@ -68,32 +68,51 @@ creating the production GitHub release.
 
 ## Production release
 
-1. Confirm that `0.1.1` is not already present on PyPI and that the TestPyPI
-   rehearsal passed for the same commit.
-2. Create the annotated tag from the verified `main` commit and push it:
+1. Confirm that `0.2.0` is not already present on PyPI and that the TestPyPI
+   rehearsal passed for the current `main` commit. This commit is the immutable
+   artifact source; do not amend it after the workflow builds the assets.
+2. Download the complete `python-package-distributions` artifact from that
+   workflow run. Keep the wheel, source distribution, and `SHA256SUMS` together
+   without renaming or adding files:
 
    ```console
-   git tag -a v0.1.1 -m "ANYmaterial 0.1.1"
-   git push origin v0.1.1
+   gh run download RUN_ID --repo audunarn/ANYmaterial --name python-package-distributions --dir release-assets
    ```
 
-3. Create a GitHub release for the existing `v0.1.1` tag, using the `0.1.1`
-   changelog entry as the release notes. Publish it as a normal release, not a
-   draft or prerelease. Publishing the GitHub release triggers the production
-   job; approve the `pypi` environment deployment after checking the commit and
-   tag.
-4. Watch the **Publish** workflow through artifact verification and upload. The
-   workflow rejects a release tag that does not equal `v` plus the package
-   version.
-5. Verify the public release in another fresh environment:
+3. Record the artifact-source commit and tree, byte counts, and uppercase SHA-256
+   digests of both distributions. Record distinct SHA-256 digests for the
+   accepted qualification evidence and its independent review. Create canonical,
+   key-sorted JSON at `docs/release/anymaterial-0.2.0-ledger.json` using the
+   `anyecosystem.release-ledger-v1` schema and terminal
+   `ACCEPTED_ANYMATERIAL_0_2_0_RELEASE`.
+4. Commit only that new ledger. It must be the direct child of the artifact
+   source, with no other file changed. Tag this ledger commit and push both:
 
    ```console
-   python -m pip install ANYmaterial==0.1.1
+   git add docs/release/anymaterial-0.2.0-ledger.json
+   git commit -m "docs: authorize ANYmaterial 0.2.0 release"
+   git tag -a v0.2.0 -m "ANYmaterial 0.2.0"
+   git push origin main v0.2.0
+   ```
+
+5. Create the GitHub release for the existing `v0.2.0` tag, use the `0.2.0`
+   changelog entry as its notes, and attach exactly the wheel, source
+   distribution, and `SHA256SUMS` downloaded above. Publish it as a normal
+   release, not a draft or prerelease. Approve the `pypi` environment only after
+   confirming the tag, source commit, ledger, assets, qualification evidence,
+   and independent review.
+6. Watch the **Publish** workflow. Its verifier rejects any moved tag, non-ledger
+   commit, changed source tree, extra or missing asset, hash mismatch, package
+   identity mismatch, or unreviewed runtime dependency license before upload.
+7. Verify the public release in another fresh environment:
+
+   ```console
+   python -m pip install ANYmaterial==0.2.0
    anymaterial --help
    anymaterial --json library
-   python -c "import anymaterial as am; assert am.__version__ == '0.1.1'; assert len(am.library().names) == 33"
+   python -c "import anymaterial as am; assert am.__version__ == '0.2.0'; assert len(am.library().names) == 33"
    ```
 
-6. Confirm the final [PyPI project page](https://pypi.org/project/ANYmaterial/)
-   shows the correct README, GPL-3.0-or-later license, Python requirement,
-   homepage, repository, and issue links.
+8. Confirm the final [PyPI project page](https://pypi.org/project/ANYmaterial/)
+   shows the correct README, MPL-2.0 license expression, Python requirement,
+   homepage, repository, issue links, and complete license/notice bundle.

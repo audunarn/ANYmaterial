@@ -4,6 +4,22 @@
 
 No changes yet.
 
+## 0.2.0 - 2026-09-03
+
+Changed:
+
+- **Prospective license transition.** Starting with 0.2.0, project-owned source
+  code is licensed under the Mozilla Public License 2.0. Earlier published
+  versions retain their historical GPL-3.0-or-later terms; Git history is not
+  rewritten or relicensed.
+- **Separate content licensing.** Original project documentation is licensed
+  under CC BY 4.0. Bundled engineering datasets now ship with explicit data
+  licensing, provenance, transformation, units, assumptions, access dates, and
+  source-specific redistribution notices rather than being treated as software.
+- **License assurance.** Package metadata, distributions, release checks, and
+  CI now assert MPL-2.0 and the complete notice bundle. Runtime dependency
+  licenses are inventoried and fail closed when an unreviewed identifier appears.
+
 ## 0.1.1 - 2026-08-28
 
 Added:

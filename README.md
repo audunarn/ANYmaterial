@@ -228,6 +228,20 @@ is a bug, not a convention. The RP-C208 tables are tabulated in MPa in the sourc
 document and converted once, at the data-file boundary. The editor accepts GPa and
 MPa because that is how they are quoted on a drawing, and converts at the widget.
 
+## License
+
+Starting with version 0.2.0, ANYmaterial source code is licensed under the
+Mozilla Public License 2.0 (`MPL-2.0`). See [LICENSE](LICENSE) for the full terms and
+[NOTICE](NOTICE) for the prospective licensing transition. Earlier published
+versions retain the license terms that applied to them.
+
+Original project documentation is licensed under CC BY 4.0 as described in
+[docs/LICENSE.md](docs/LICENSE.md). Bundled engineering data is separately
+licensed and attributed in
+[src/anymaterial/data/LICENSE_DATA.md](src/anymaterial/data/LICENSE_DATA.md) and
+[src/anymaterial/data/SOURCES.md](src/anymaterial/data/SOURCES.md). Dependency
+licenses are recorded in [THIRD_PARTY_NOTICES.md](THIRD_PARTY_NOTICES.md).
+
 ## Development
 
 ```powershell

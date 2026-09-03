@@ -46,28 +46,58 @@ jobs:
               "anymaterial/__init__.py",
               "anymaterial/__main__.py",
               "anymaterial/data/dnv_rp_c208.json",
+              "anymaterial/data/LICENSE_DATA.md",
               "anymaterial/data/materials.json",
+              "anymaterial/data/SOURCES.md",
           }
           with zipfile.ZipFile(wheels[0]) as archive:
               wheel_names = set(archive.namelist())
+              metadata_name = next(
+                  name for name in wheel_names if name.endswith(".dist-info/METADATA")
+              )
+              from email.parser import BytesParser
+              from email.policy import default
+              metadata = BytesParser(policy=default).parsebytes(
+                  archive.read(metadata_name)
+              )
           missing = required - wheel_names
           assert not missing, f"wheel is missing: {sorted(missing)}"
+          assert metadata["License-Expression"] == "MPL-2.0"
           assert any(name.endswith(".dist-info/entry_points.txt") for name in wheel_names)
-          assert any(name.endswith(".dist-info/licenses/LICENSE") for name in wheel_names)
+          for suffix in (
+              ".dist-info/licenses/LICENSE",
+              ".dist-info/licenses/NOTICE",
+              ".dist-info/licenses/THIRD_PARTY_NOTICES.md",
+              ".dist-info/licenses/docs/LICENSE.md",
+              ".dist-info/licenses/src/anymaterial/data/LICENSE_DATA.md",
+              ".dist-info/licenses/src/anymaterial/data/SOURCES.md",
+          ):
+              assert any(name.endswith(suffix) for name in wheel_names), suffix
 
           with tarfile.open(sdists[0], "r:gz") as archive:
               sdist_names = archive.getnames()
           for suffix in (
               "/LICENSE",
+              "/NOTICE",
               "/README.md",
+              "/THIRD_PARTY_NOTICES.md",
               "/CHANGELOG.md",
               "/ECOSYSTEM_GUIDE.md",
               "/RELEASING.md",
+              "/docs/LICENSE.md",
               "/tests/test_packaging.py",
               "/src/anymaterial/data/dnv_rp_c208.json",
+              "/src/anymaterial/data/LICENSE_DATA.md",
               "/src/anymaterial/data/materials.json",
+              "/src/anymaterial/data/SOURCES.md",
+              "/tools/check_dependency_licenses.py",
+              "/tools/verify_release_authority.py",
           ):
               assert any(name.endswith(suffix) for name in sdist_names), suffix
+      - name: Audit installed runtime dependency licenses
+        run: |
+          python -m pip install dist/*.whl
+          python tools/check_dependency_licenses.py
       - name: Generate release checksums
         run: cd dist && sha256sum *.whl *.tar.gz > SHA256SUMS
       - uses: actions/upload-artifact@ea165f8d65b6e75b540449e92b4886f43607fa02 # v4
@@ -91,7 +121,7 @@ jobs:
       - name: Smoke-test the installed package
         working-directory: /tmp
         run: |
-          python -c "import anymaterial; assert anymaterial.__version__ == '0.1.1'"
+          python -c "import anymaterial; assert anymaterial.__version__ == '0.2.0'"
           python -c "import anymaterial.gui; assert callable(anymaterial.gui.main)"
           python -c "from importlib.resources import files; import anymaterial as am; assert len(am.library().names) == 33; assert files('anymaterial').joinpath('data/materials.json').is_file(); assert files('anymaterial').joinpath('data/dnv_rp_c208.json').is_file()"
           anymaterial --help >/dev/null
@@ -151,16 +181,20 @@ jobs:
           RELEASE_TAG: ${{ github.event.release.tag_name }}
         run: |
           python tools/verify_release_authority.py \
-            --ledger docs/release/anymaterial-0.1.1-ledger.json \
+            --ledger docs/release/anymaterial-0.2.0-ledger.json \
             --assets release-assets \
             --output dist \
             --tag "$RELEASE_TAG" \
             --protected-ref refs/remotes/origin/main \
-            --expected-terminal ACCEPTED_ANYMATERIAL_0_1_1_RELEASE \
+            --expected-terminal ACCEPTED_ANYMATERIAL_0_2_0_RELEASE \
             --distribution ANYmaterial \
-            --version 0.1.1 \
-            --artifact anymaterial-0.1.1-py3-none-any.whl \
-            --artifact anymaterial-0.1.1.tar.gz
+            --version 0.2.0 \
+            --artifact anymaterial-0.2.0-py3-none-any.whl \
+            --artifact anymaterial-0.2.0.tar.gz
+      - name: Audit published runtime dependency licenses
+        run: |
+          python -m pip install dist/*.whl
+          python tools/check_dependency_licenses.py
       - name: Publish exact ledger-authorized distributions
         uses: pypa/gh-action-pypi-publish@dc37677b2e1c63e2034f94d8a5b11f265b73ba33 # release/v1
         with:

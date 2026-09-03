@@ -1,0 +1,16 @@
+ANYmaterial
+Copyright (c) Audun Nyhus
+
+This Source Code Form is subject to the terms of the Mozilla Public License,
+v. 2.0. If a copy of the MPL was not distributed with this file, You can
+obtain one at https://mozilla.org/MPL/2.0/.
+
+Starting with version 0.2.0, project-owned ANYmaterial source code is
+distributed under MPL-2.0. Earlier published versions remain available under
+the license terms that applied to those versions. No Git history or historical
+release is relicensed by this notice.
+
+Original project documentation and bundled engineering data have separate
+licensing notices. Third-party software and source material retain their own
+terms. See docs/LICENSE.md, src/anymaterial/data/LICENSE_DATA.md,
+src/anymaterial/data/SOURCES.md, and THIRD_PARTY_NOTICES.md.

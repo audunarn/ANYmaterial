@@ -8,6 +8,8 @@ dependencies turns the layering check into decoration.
 from __future__ import annotations
 
 import re
+import subprocess
+import sys
 import tomllib
 from pathlib import Path
 
@@ -38,6 +40,61 @@ def _declared_dependencies() -> set[str]:
 
 def test_version_matches_pyproject() -> None:
     assert anymaterial.__version__ == _pyproject()["project"]["version"]
+
+
+def test_release_metadata_is_0_2_0_and_mpl_2_0() -> None:
+    project = _pyproject()["project"]
+    assert project["version"] == "0.2.0"
+    assert project["license"] == "MPL-2.0"
+    assert not any(value.startswith("License ::") for value in project["classifiers"])
+
+
+def test_release_license_bundle_is_complete_and_consistent() -> None:
+    project = _pyproject()["project"]
+    assert project["license-files"] == [
+        "LICENSE",
+        "NOTICE",
+        "THIRD_PARTY_NOTICES.md",
+        "docs/LICENSE.md",
+        "src/anymaterial/data/LICENSE_DATA.md",
+        "src/anymaterial/data/SOURCES.md",
+    ]
+    assert (REPOSITORY_ROOT / "LICENSE").read_text(encoding="utf-8").startswith(
+        "Mozilla Public License Version 2.0\n"
+    )
+    notice = (REPOSITORY_ROOT / "NOTICE").read_text(encoding="utf-8")
+    assert "Copyright (c) Audun Nyhus" in notice
+    assert "Starting with version 0.2.0" in notice
+    assert "Earlier published versions" in notice
+    assert "MPL-2.0" in (REPOSITORY_ROOT / "README.md").read_text(encoding="utf-8")
+    assert "CC BY 4.0" in (REPOSITORY_ROOT / "docs" / "LICENSE.md").read_text(
+        encoding="utf-8"
+    )
+    data_license = (
+        REPOSITORY_ROOT / "src" / "anymaterial" / "data" / "LICENSE_DATA.md"
+    ).read_text(encoding="utf-8")
+    assert "engineering data assets" in data_license
+    assert "Mozilla Public License 2.0" in data_license
+    assert "CC BY 4.0" in data_license
+    sources = (
+        REPOSITORY_ROOT / "src" / "anymaterial" / "data" / "SOURCES.md"
+    ).read_text(encoding="utf-8")
+    assert "DNV-RP-C208" in sources
+    assert "doi.org/10.5281/zenodo.6965147" in sources
+    assert "NumPy" in (REPOSITORY_ROOT / "THIRD_PARTY_NOTICES.md").read_text(
+        encoding="utf-8"
+    )
+
+
+def test_runtime_dependency_licenses_are_reviewed() -> None:
+    completed = subprocess.run(
+        [sys.executable, "tools/check_dependency_licenses.py"],
+        cwd=REPOSITORY_ROOT,
+        capture_output=True,
+        text=True,
+    )
+    assert completed.returncode == 0, completed.stderr
+    assert '"name": "numpy"' in completed.stdout.casefold()
 
 
 def test_distribution_and_import_names_are_as_intended() -> None:

@@ -1,9 +1,13 @@
 include LICENSE
+include NOTICE
+include THIRD_PARTY_NOTICES.md
 include README.md
 include CHANGELOG.md
 include ECOSYSTEM_GUIDE.md
 include MIGRATION.md
 include RELEASING.md
 recursive-include docs *.md
-recursive-include src/anymaterial/data *.json
+recursive-include src/anymaterial/data *.json *.md
 recursive-include tests *.py
+include tools/check_dependency_licenses.py
+include tools/verify_release_authority.py

@@ -4,11 +4,19 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "ANYmaterial"
-version = "0.1.1"
+version = "0.2.0"
 description = "Structural material models: isotropic and orthotropic elasticity, nonlinear hardening curves"
 readme = "README.md"
 requires-python = ">=3.11"
-license = "GPL-3.0-or-later"
+license = "MPL-2.0"
+license-files = [
+  "LICENSE",
+  "NOTICE",
+  "THIRD_PARTY_NOTICES.md",
+  "docs/LICENSE.md",
+  "src/anymaterial/data/LICENSE_DATA.md",
+  "src/anymaterial/data/SOURCES.md",
+]
 authors = [
   { name = "Audun Arnesen Nyhus", email = "audunarn@gmail.com" },
 ]
@@ -57,7 +65,7 @@ where = ["src"]
 include = ["anymaterial*"]
 
 [tool.setuptools.package-data]
-anymaterial = ["data/*.json"]
+anymaterial = ["data/*.json", "data/*.md"]
 
 [tool.pytest.ini_options]
 testpaths = ["tests"]
