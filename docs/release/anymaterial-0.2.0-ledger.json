@@ -1,0 +1,28 @@
+{
+  "artifact_source": {
+    "commit": "1a5bdd2fb7143797dbfbc1592ba6eed8ed949d6a",
+    "tree": "2e1850cedf0aecdc276851a7781f00b419372edc"
+  },
+  "artifacts": [
+    {
+      "bytes": 70171,
+      "filename": "anymaterial-0.2.0-py3-none-any.whl",
+      "sha256": "2620403F8F5CBF78D0335A93EB199E34CF761A7199669FB8D1A5C54C73A60A50"
+    },
+    {
+      "bytes": 108850,
+      "filename": "anymaterial-0.2.0.tar.gz",
+      "sha256": "F3367E1E7589FB1E6BC1E825FB8EF7C672F7AB25C1E0323F4708498D821CF645"
+    }
+  ],
+  "distribution": "ANYmaterial",
+  "publication_authorized": true,
+  "qualification": {
+    "accepted_terminal": "ACCEPTED_ANYMATERIAL_0_2_0_RELEASE",
+    "evidence_sha256": "4B7B383382091DCC90535FE46FD91B83B472A41F21ED82F0A74DA003F38B6E88",
+    "independent_review_sha256": "471824DC654251CDF990402F2944B6F47AC99D6482A2A2F9808D0AC04F6C77A0"
+  },
+  "schema": "anyecosystem.release-ledger-v1",
+  "tag": "v0.2.0",
+  "version": "0.2.0"
+}
