@@ -386,6 +386,9 @@ def test_manual_testpypi_path_remains_separate() -> None:
     workflow = (ROOT / ".github/workflows/publish.yml").read_text(encoding="utf-8")
     assert "repository-url: https://test.pypi.org/legacy/" in workflow
     assert "sha256sum *.whl *.tar.gz > SHA256SUMS" in workflow
+    testpypi = workflow.split("\n  testpypi:\n", 1)[1].split("\n  pypi:\n", 1)[0]
+    assert "rm dist/SHA256SUMS" in testpypi
+    assert testpypi.index("rm dist/SHA256SUMS") < testpypi.index(PUBLISH_ACTION)
 
 
 def test_all_workflow_actions_are_exactly_pinned() -> None:
