@@ -5,13 +5,13 @@
 ```
 ANYmaterial ──┐
               ├──→ ANYfileio ──┐
-ANYmesher ────┘                ├──→ ANYsolver ──→ ANYfem
+ANYmesher ────┘                ├──→ ANYfeSolver ──→ ANYfem
                                │         └──────→ ANYstructure
                                └────────────────→ ANYstructure
 ```
 
 ANYmaterial is a leaf. It imports numpy and the standard library, and nothing
-else in the family. That is not a stylistic preference: ANYsolver depends on
+else in the family. That is not a stylistic preference: ANYfeSolver depends on
 ANYmaterial, so any import in the other direction closes a cycle and the two
 packages can no longer be versioned or released independently.
 `tests/test_layering.py` enforces it by walking the AST of every module, because
@@ -19,7 +19,7 @@ the rule is one careless debug import away from being broken.
 
 The same constraint decides where things live. A material *record* belongs here;
 turning that record into a solver element's constitutive matrices at assembly
-time belongs in ANYsolver. Where a function needs both, the neutral half is here
+time belongs in ANYfeSolver. Where a function needs both, the neutral half is here
 and the adapter is there.
 
 ## Conventions
@@ -46,7 +46,7 @@ there is one place for the algebra to be wrong.
 
 ## Structural typing at the boundary
 
-ANYsolver accepts any object satisfying its material protocol — a name, a
+ANYfeSolver accepts any object satisfying its material protocol — a name, a
 density, a declared elastic symmetry and an `elastic_compliance_matrix()`. It
 does not require inheritance from anything here. That is what lets ANYmaterial
 supply materials across a repository boundary without either side importing the
