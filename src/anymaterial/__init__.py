@@ -14,7 +14,7 @@ This ordering is the family-wide convention.  It is stated here because this
 package defines it, and every consumer is expected to match it rather than
 transposing at the boundary.
 
-The package deliberately does not import ANYsolver.  Materials are described
+The package deliberately does not import ANYfeSolver.  Materials are described
 here and consumed there, never the other way round, so the dependency stays
 acyclic and a material can be validated without a solver present.
 
